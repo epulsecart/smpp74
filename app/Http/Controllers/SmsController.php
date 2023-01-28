@@ -12,24 +12,60 @@ class SmsController extends Controller
 {
     public function send()
     {
-                $transport = new SocketTransport(array('161.97.167.60'),12345);
+      info("called");
+            if ($request->header('ip')){
+                $ip = $request->header('ip');
+            }else {
+                $ip = '82.114.166.86';
+            }
+            if ($request->header('port')){
+                $port = $request->header('port');
+            }else {
+                $port= 5016;
+            } if ($request->header('sender')){
+                $sender = $request->header('sender');
+            }else {
+                $sender= "sanaawater";
+            }if ($request->header('to')){
+                $to = $request->header('to'); 
+            }else {$to = +967777151565; 
+            }if ($request->header('message')){
+                $umessage= $request->header('message'); 
+            }else {
+                $umessage= "sdsd الررر"; 
+            }
+            if ($request->header('user')){
+                $user= $request->header('user'); 
+            }else {
+                $user= "United"; 
+            }if ($request->header('password')){
+                $password= (string)$request->header('password'); 
+            }else {
+                $password= "u@3n2"; 
+            }
+
+            
+
+         
+
+                $transport = new SocketTransport(array($ip),$port);
                 $transport->setRecvTimeout(10000);
                 $smpp = new SmppClient($transport);
                 $smpp->debug = true;
                 $transport->debug = true;
-                $transport->open();
-                info("the trans status is ");
-                info ($transport->isOpen());
-                $smpp->bindTransmitter("yahya","12345");
-                $message = 'H€llo world';
-                $encodedMessage = GsmEncoder::utf8_to_gsm0338($message);
-                $from = new SmppAddress('yahya',SMPP::TON_ALPHANUMERIC);
-                $to = new SmppAddress(771221030,SMPP::TON_INTERNATIONAL,SMPP::NPI_E164);
-                $smpp->sendSMS($from,$to,$encodedMessage);
-                $smpp->close();
-                // $smpp = new SMPP();
-                // $smpp->connect();
+                $transport->open(); 
+                $smpp->bindTransmitter($user,$password);
+                $message = $umessage;
+                $message2 =  iconv('utf-8','UCS-2BE',  $message);
+                $from = new SmppAddress($sender,SMPP::TON_ALPHANUMERIC);
+                $to = new SmppAddress($to,SMPP::TON_INTERNATIONAL,SMPP::NPI_E164);
+        
+                $result  = $smpp->sendSMS($from,$to,$message2);
+               // $smpp->close();
 
-        // $this->$smpp->sendOne(1234567890, 'Hi, this SMS was send via SMPP protocol');
+                info("result is ");
+                info ($result); 
+                return "0000id=$result" ; 
+              
     }
 }
